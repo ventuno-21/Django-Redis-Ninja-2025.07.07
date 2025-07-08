@@ -1,0 +1,5 @@
+how o make an imgae in docker?
+
+after making docker-compose.yml
+user beow command:
+$ docker compose up --build -d
