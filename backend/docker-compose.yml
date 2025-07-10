@@ -1,6 +1,22 @@
 name: Redis-In-Action
 
 services:
+  postgres:
+    image: postgres:17.4-alpine3.21
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgresql
+      POSTGRES_DB: inventory
+    volumes:
+      # Copies your local init.sql file into a special directory inside the container.
+      # It will automatically execute this script the first time the container runs. You can use it to create tables, insert data, or run other setup commands.
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db_data:/data
+    ports:
+      - "5432:5432"
+
   redis:
     image: redis:alpine3.20
     container_name: redis_server
@@ -16,3 +32,28 @@ services:
     restart: always
     ports:
       - "5540:5540"
+    
+  django:
+    build: .
+    container_name: django_app
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./app:/app
+    ports:
+      - "8000:8000"
+    command: >
+          sh -c "
+              if python manage.py shell -c 'from django.contrib.auth.models import User; print(User.objects.filter(username=\"admin\").exists())' | grep -q 'True'; then
+                echo 'Admin user exists, skipping app and database setup';
+              else
+                rm -f inventory/migrations/0001_initial.py &&
+                python manage.py migrate &&
+                python manage.py makemigrations &&
+                python manage.py migrate inventory --fake &&
+                python manage.py shell -c 'from django.contrib.auth.models import User; User.objects.create_superuser(\"admin\", \"admin@admin.com\", \"admin\");' ;
+              fi &&
+              python manage.py runserver 0.0.0.0:8000
+            "
