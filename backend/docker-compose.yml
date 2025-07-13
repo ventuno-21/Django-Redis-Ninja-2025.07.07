@@ -26,7 +26,7 @@ services:
   
   redisinsight:
     image: redis/redisinsight:2.68
-    container_name: redis_nsight
+    container_name: redis_insight
     depends_on:
       - redis
     restart: always
