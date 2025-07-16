@@ -1,0 +1,15 @@
+how o make an imgae in docker?
+
+after making docker-compose.yml
+user beow command:
+$ docker compose up --build -d
+
+
+first "django" is our  "service name" in docker-compose file:
+$ docker-compose run django django-admin startproject core .
+
+
+Note: Docker-compose file authomatically look for .env file so we dont
+need to install any package to use the variables inside .env file 
+
+=======================================
