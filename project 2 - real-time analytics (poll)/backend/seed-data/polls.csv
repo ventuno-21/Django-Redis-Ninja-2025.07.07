@@ -1,0 +1,11 @@
+id,question,text
+1,"What is your favorite color?","[""Red"", ""Blue"", ""Green"", ""Yellow""]"
+2,"Which programming language do you prefer?","[""Python"", ""Java"", ""JavaScript"", ""C++""]"
+3,"How satisfied are you with our service?","[""Very Satisfied"", ""Satisfied"", ""Neutral"", ""Dissatisfied""]"
+4,"What is your favorite book genre?","[""Fiction"", ""Non-Fiction"", ""Sci-Fi"", ""Fantasy""]"
+5,"How often do you exercise?","[""Daily"", ""Weekly"", ""Monthly"", ""Rarely""]"
+6,"What is your preferred music genre?","[""Rock"", ""Pop"", ""Classical"", ""Jazz""]"
+7,"How would you rate this product?","{""scale"": [1, 2, 3, 4, 5], ""type"": ""rating""}"
+8,"What is your favorite hobby?","[""Reading"", ""Gaming"", ""Sports"", ""Cooking""]"
+9,"How often do you travel?","[""Frequently"", ""Occasionally"", ""Rarely"", ""Never""]"
+10,"What is your favorite movie genre?","[""Action"", ""Comedy"", ""Drama"", ""Horror""]"
