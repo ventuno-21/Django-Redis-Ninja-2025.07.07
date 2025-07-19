@@ -18,3 +18,7 @@ class CreatePollOut(CreatePoll):
 
 class ErrorSchema(Schema):
     error: str
+
+
+class VoteSchema(Schema):
+    option: str

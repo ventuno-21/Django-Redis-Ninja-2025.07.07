@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import redis
+import redis.asyncio as redis
 import os
 from dotenv import load_dotenv  # if using python-dotenv
 
@@ -101,17 +101,13 @@ print("#######################################")
 print("DB_PORT:", os.environ.get("DB_PORT"))
 print("#######################################")
 
-# REDIS_HOST = "redis"
-# REDIS_PORT = 6379
-# REDIS_DB = 0
-# REDIS_DECODE_RESPONSES = True
 
-# REDIS_CLIENT = redis.Redis(
-#     host=REDIS_HOST,
-#     port=REDIS_PORT,
-#     db=REDIS_DB,
-#     decode_responses=REDIS_DECODE_RESPONSES,
-# )
+REDIS_CLIENT = redis.Redis(
+    host=os.environ.get("REDIS_HOST", "redis"),
+    port=int(os.environ.get("REDIS_PORT", 6379)),
+    db=int(os.environ.get("REDIS_DB", 0)),
+    decode_responses=os.environ.get("REDIS_DECODE_RESPONSES", "True") == "True",
+)
 
 
 # Password validation

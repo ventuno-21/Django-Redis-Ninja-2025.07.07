@@ -2,10 +2,11 @@ from typing import List
 
 from asgiref.sync import sync_to_async
 from django.shortcuts import render
+from .services.redis_poll_services import increment_vote
 from ninja import Router
 
 from .models import Poll
-from .schemas import CreatePoll, CreatePollOut, PollOut, ErrorSchema
+from .schemas import CreatePoll, CreatePollOut, PollOut, ErrorSchema, VoteSchema
 
 # Create your views here.
 
@@ -27,3 +28,23 @@ async def create_poll(request, data: CreatePoll):
     await poll.asave()
     # return 201, CreatePollOut(id=poll.id, question=poll.question, text=poll.text)
     return 201, poll
+
+
+@router.post(
+    "/polls/{poll_id}/vote", response={200: dict, 400: ErrorSchema, 404: ErrorSchema}
+)
+async def vote(request, poll_id: int, data: VoteSchema):
+
+    option_id = data.option
+
+    try:
+        poll = await Poll.objects.aget(pk=poll_id)
+    except Poll.DoesNotExist:
+        return 404, {"error": "Poll not found"}
+
+    if option_id not in poll.text:
+        return 400, {"error": "Invalid option ID"}
+
+    await increment_vote(poll_id, option_id)
+
+    return {"message": f"Vote for option {option_id} is considered"}
