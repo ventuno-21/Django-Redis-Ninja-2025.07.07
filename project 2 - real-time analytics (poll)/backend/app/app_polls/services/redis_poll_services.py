@@ -1,10 +1,10 @@
 from django.conf import settings
-
+import json
 
 r = settings.REDIS_CLIENT
 
 
-def get_poll_key(poll_id: int, suffix: str):
+def get_poll_key(poll_id: int, suffix: str) -> str:
     return f"poll:{poll_id}:{suffix}"
 
 
@@ -41,3 +41,17 @@ async def try_register_vote(poll_id: int, voter_id: str, suffix: str) -> bool:
 #     """Register a user as having voted"""
 #     key = get_poll_key(poll_id, "voted_users")
 #     return await r.sismember(key, user_id)
+
+
+async def track_recent_vote(poll_id: int, user_id: str, ip: str, option_id: str):
+    key = get_poll_key(poll_id, "recent_votes")
+    vote_data = {"user_id": user_id, "ip": ip, "option_id": option_id}
+
+    await r.lpush(key, json.dumps(vote_data))
+    await r.ltrim(key, 0, 99)  # only last 100 entries will be kept
+
+
+async def get_recent_vote(poll_id: int) -> list:
+    key = get_poll_key(poll_id, "recent_votes")
+    votes = await r.lrange(key, 0, 99)  # only last 100 entries
+    return [json.loads(v) for v in votes]

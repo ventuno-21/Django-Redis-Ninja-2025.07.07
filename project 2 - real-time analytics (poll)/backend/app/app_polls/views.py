@@ -9,7 +9,12 @@ from .models import Poll
 from .schemas import CreatePoll, CreatePollOut, ErrorSchema, PollOut, VoteSchema
 from .services.cookie_services import has_cookie_voted, set_vote_cookie
 from .services.ip_services import get_client_ip
-from .services.redis_poll_services import increment_vote, try_register_vote
+from .services.redis_poll_services import (
+    increment_vote,
+    try_register_vote,
+    track_recent_vote,
+    get_recent_vote,
+)
 
 # Create your views here.
 
@@ -71,6 +76,7 @@ async def vote(
         return 400, {"error": "This ip/browser has already voted"}
 
     await increment_vote(poll_id, option_id)
+    await track_recent_vote(poll_id, user_id or "anonymous", ip, option_id)
 
     response = JsonResponse({"message": f"Vote for option {option_id} is considered"})
     set_vote_cookie(response, request, poll_id)
