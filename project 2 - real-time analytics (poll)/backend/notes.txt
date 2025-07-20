@@ -13,3 +13,7 @@ Note: Docker-compose file authomatically look for .env file so we dont
 need to install any package to use the variables inside .env file 
 
 =======================================
+
+what is the accesssibilty link address to swagger mode in django ninja ?
+
+http://127.0.0.1:8000/api/docs

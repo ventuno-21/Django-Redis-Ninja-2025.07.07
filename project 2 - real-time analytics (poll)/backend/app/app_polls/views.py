@@ -1,12 +1,15 @@
 from typing import List
 
 from asgiref.sync import sync_to_async
+from django.http import JsonResponse
 from django.shortcuts import render
-from .services.redis_poll_services import increment_vote
-from ninja import Router
+from ninja import Header, Router
 
 from .models import Poll
-from .schemas import CreatePoll, CreatePollOut, PollOut, ErrorSchema, VoteSchema
+from .schemas import CreatePoll, CreatePollOut, ErrorSchema, PollOut, VoteSchema
+from .services.cookie_services import has_cookie_voted, set_vote_cookie
+from .services.ip_services import get_client_ip
+from .services.redis_poll_services import increment_vote, try_register_vote
 
 # Create your views here.
 
@@ -33,7 +36,12 @@ async def create_poll(request, data: CreatePoll):
 @router.post(
     "/polls/{poll_id}/vote", response={200: dict, 400: ErrorSchema, 404: ErrorSchema}
 )
-async def vote(request, poll_id: int, data: VoteSchema):
+async def vote(
+    request,
+    poll_id: int,
+    data: VoteSchema,
+    x_user_id: str = Header(None),
+):
 
     option_id = data.option
 
@@ -45,6 +53,25 @@ async def vote(request, poll_id: int, data: VoteSchema):
     if option_id not in poll.text:
         return 400, {"error": "Invalid option ID"}
 
+    ip = get_client_ip(request)
+    user_id = request.headers.get("X-USER-ID")
+
+    if user_id:
+        success = await try_register_vote(poll_id, user_id, "voted_user")
+        if not success:
+            return 400, {"error": "User has already voted"}
+
+        # if await has_user_voted(poll_id, user_id):
+        #     return 400, {"error": "User has laready voted"}
+        # await register_user_vote(poll_id, user_id)
+
+    ip_already_voted = not await try_register_vote(poll_id, ip, "voted_ips")
+
+    if ip_already_voted or has_cookie_voted(request, poll_id):
+        return 400, {"error": "This ip/browser has already voted"}
+
     await increment_vote(poll_id, option_id)
 
-    return {"message": f"Vote for option {option_id} is considered"}
+    response = JsonResponse({"message": f"Vote for option {option_id} is considered"})
+    set_vote_cookie(response, request, poll_id)
+    return response
