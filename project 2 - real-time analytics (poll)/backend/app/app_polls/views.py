@@ -13,6 +13,7 @@ from .services.redis_poll_services import (
     try_register_vote,
     record_vote,
     get_poll_vote_count,
+    is_rate_limited,
 )
 
 # Create your views here.
@@ -65,6 +66,9 @@ async def vote(
 
     ip = get_client_ip(request)
     user_id = request.headers.get("X-USER-ID")
+
+    if await is_rate_limited(ip):
+        return 400, {"error": "You are voting so quickly, please wait few seconds ..."}
 
     if user_id:
         success = await try_register_vote(poll_id, user_id, "voted_user")

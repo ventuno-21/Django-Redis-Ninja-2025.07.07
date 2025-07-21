@@ -3,6 +3,23 @@ import json
 
 r = settings.REDIS_CLIENT
 
+RATE_LIMIT_SECONDS = 5
+
+
+async def is_rate_limited(ip: str) -> bool:
+    key = f"rate_limit:{ip}"
+    """_
+    If key does not exist, Redis sets it to 1 and the key expires
+    after RATE_LIMIT_SECONDS seconds.
+    If key already exists, it does nothing — rate limit preserved.
+    
+    The return value added will be:
+    True: key was created (action allowed)
+    None: key already exists (action rate-limited)
+    """
+    added = await r.set(key, 1, ex=RATE_LIMIT_SECONDS, nx=True)
+    return added is None  # If key already exists, rate limited
+
 
 def get_poll_key(poll_id: int, suffix: str) -> str:
     return f"poll:{poll_id}:{suffix}"
