@@ -1,10 +1,10 @@
-id,question,text
-1,"What is your favorite color?","{""1"":""Red"",""2"": ""Green"", ""3"": ""Blue"", ""4"": ""Yellow""}"
-2,"Which programming language do you prefer?","{""1"":""Python"",""2"": ""Java"",  ""3"":""JavaScript"",""4"":  ""C++""}"
-3,"How satisfied are you with our service?","{""1"":""Very Satisfied"",""2"": ""Satisfied"",  ""3"":""Neutral"",""4"":  ""Dissatisfied""}"
-4,"What is your favorite book genre?","{""1"":""Fiction"",""2"": ""Non-Fiction"", ""3"": ""Sci-Fi"", ""4"": ""Fantasy""}"
-5,"How often do you exercise?","{""1"":""Daily"",""2"": ""Weekly"",  ""3"":""Monthly"",""4"":  ""Rarely""}"
-6,"What is your preferred music genre?","{""1"":""Rock"",""2"": ""Pop"", ""3"": ""Classical"",""4"":  ""Jazz""}"
-7,"What is your favorite hobby?","{""1"":""Reading"",""2"": ""Gaming"",  ""3"":""Sports"",""4"":  ""Cooking""}"
-8,"How often do you travel?","{""1"":""Frequently"", ""2"":""Occasionally"", ""3"": ""Rarely"",""4"":  ""Never""}"
-9,"What is your favorite movie genre?","{""1"":""Action"",""2"": ""Comedy"", ""3"": ""Drama"",""4"":  ""Horror""}"
+id,question,text,is_active,expire_at
+1,"What is your favorite color?","{""1"":""Red"",""2"": ""Green"", ""3"": ""Blue"", ""4"": ""Yellow""}",True,2030-01-01T00:00:00Z
+2,"Which programming language do you prefer?","{""1"":""Python"",""2"": ""Java"",  ""3"":""JavaScript"",""4"":  ""C++""}",True,2030-01-01T00:00:00Z
+3,"How satisfied are you with our service?","{""1"":""Very Satisfied"",""2"": ""Satisfied"",  ""3"":""Neutral"",""4"":  ""Dissatisfied""}",True,2030-01-01T00:00:00Z
+4,"What is your favorite book genre?","{""1"":""Fiction"",""2"": ""Non-Fiction"", ""3"": ""Sci-Fi"", ""4"": ""Fantasy""}",True,2030-01-01T00:00:00Z
+5,"How often do you exercise?","{""1"":""Daily"",""2"": ""Weekly"",  ""3"":""Monthly"",""4"":  ""Rarely""}",True,2030-01-01T00:00:00Z
+6,"What is your preferred music genre?","{""1"":""Rock"",""2"": ""Pop"", ""3"": ""Classical"",""4"":  ""Jazz""}",True,2030-01-01T00:00:00Z
+7,"What is your favorite hobby?","{""1"":""Reading"",""2"": ""Gaming"",  ""3"":""Sports"",""4"":  ""Cooking""}",True,2030-01-01T00:00:00Z
+8,"How often do you travel?","{""1"":""Frequently"", ""2"":""Occasionally"", ""3"": ""Rarely"",""4"":  ""Never""}",True,2030-01-01T00:00:00Z
+9,"What is your favorite movie genre?","{""1"":""Action"",""2"": ""Comedy"", ""3"": ""Drama"",""4"":  ""Horror""}",True,2030-01-01T00:00:00Z

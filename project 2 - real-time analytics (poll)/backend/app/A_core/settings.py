@@ -86,19 +86,21 @@ WSGI_APPLICATION = "A_core.wsgi.application"
 #     }
 # }
 
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME"),
-        "USER": os.environ.get("DB_USER"),
-        "PASSWORD": os.environ.get("DB_PASSWORD"),
-        "HOST": os.environ.get("DB_HOST"),  # Matches service name in docker-compose
-        "PORT": os.environ.get("DB_PORT"),
+        "NAME": os.getenv("POSTGRES_DB", "poll"),
+        "USER": os.getenv("POSTGRES_USER", "postgres"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "postgresql"),
+        "HOST": os.getenv("POSTGRES_HOST", "localhost"),
+        "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
 
+
 print("#######################################")
-print("DB_PORT:", os.environ.get("DB_PORT"))
+print("POSTGRES_PORT:", os.environ.get("POSTGRES_PORT"))
 print("#######################################")
 
 

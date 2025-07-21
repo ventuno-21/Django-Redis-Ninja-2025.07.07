@@ -55,6 +55,12 @@ async def vote(
     except Poll.DoesNotExist:
         return 404, {"error": "Poll not found"}
 
+    if not poll.is_active:
+        return 400, {"error": "This poll is not active"}
+
+    if poll.expire_at and poll.is_expired():
+        return 400, {"error": "This poll has expired"}
+
     if option_id not in poll.text:
         return 400, {"error": "Invalid option ID"}
 

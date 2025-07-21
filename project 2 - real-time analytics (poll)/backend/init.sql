@@ -2,12 +2,14 @@
 CREATE TABLE app_polls_poll (
     id SERIAL PRIMARY KEY,
     question VARCHAR(255) NOT NULL UNIQUE,
-    text JSONB NOT NULL 
+    text JSONB NOT NULL ,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    expire_at TIMESTAMPTZ
 );
 
 
 -- Load data into tables
-COPY app_polls_poll (id, question, text)
+COPY app_polls_poll (id, question, text,is_active,expire_at)
 FROM '/data/polls.csv'
 DELIMITER ','
 DELIMITER ','
