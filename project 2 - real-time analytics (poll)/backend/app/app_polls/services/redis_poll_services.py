@@ -43,15 +43,30 @@ async def try_register_vote(poll_id: int, voter_id: str, suffix: str) -> bool:
 #     return await r.sismember(key, user_id)
 
 
-async def track_recent_vote(poll_id: int, user_id: str, ip: str, option_id: str):
-    key = get_poll_key(poll_id, "recent_votes")
-    vote_data = {"user_id": user_id, "ip": ip, "option_id": option_id}
+async def record_vote(poll_id: int, voter_id: str, ip: str, option_id: str):
+    vote_key = get_poll_key(poll_id, "votes")
+    recent_key = get_poll_key(poll_id, "recent_votes")
 
-    await r.lpush(key, json.dumps(vote_data))
-    await r.ltrim(key, 0, 99)  # only last 100 entries will be kept
+    vote_data = {"user_id": voter_id, "ip": ip, "option_id": option_id}
+
+    async with r.pipeline(transaction=True) as pipe:
+        pipe.hincrby(vote_key, option_id, 1)
+        pipe.lpush(recent_key, json.dumps(vote_data))
+        pipe.ltrim(recent_key, 0, 99)
+        await pipe.execute()
 
 
-async def get_recent_vote(poll_id: int) -> list:
-    key = get_poll_key(poll_id, "recent_votes")
-    votes = await r.lrange(key, 0, 99)  # only last 100 entries
-    return [json.loads(v) for v in votes]
+# # track_recent_vote & get_recent_vote functions are replaced with record_vote
+# async def track_recent_vote(poll_id: int, user_id: str, ip: str, option_id: str):
+#     key = get_poll_key(poll_id, "recent_votes")
+#     vote_data = {"user_id": user_id, "ip": ip, "option_id": option_id}
+
+#     await r.lpush(key, json.dumps(vote_data))
+#     await r.ltrim(key, 0, 99)  # only last 100 entries will be kept
+
+
+# # track_recent_vote & get_recent_vote functions are replaced with record_vote
+# async def get_recent_vote(poll_id: int) -> list:
+#     key = get_poll_key(poll_id, "recent_votes")
+#     votes = await r.lrange(key, 0, 99)  # only last 100 entries
+#     return [json.loads(v) for v in votes]
