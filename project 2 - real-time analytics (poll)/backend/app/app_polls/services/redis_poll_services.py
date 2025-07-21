@@ -70,3 +70,13 @@ async def record_vote(poll_id: int, voter_id: str, ip: str, option_id: str):
 #     key = get_poll_key(poll_id, "recent_votes")
 #     votes = await r.lrange(key, 0, 99)  # only last 100 entries
 #     return [json.loads(v) for v in votes]
+
+
+async def get_poll_vote_count(poll_id: int) -> dict:
+    """
+    Fetch vote counts for each option in a poll from Redis.
+    Returns a dict mapping option id -> vote count
+    """
+    key = get_poll_key(poll_id, "votes")
+    raw = await r.hgetall(key)
+    return {k: int(v) for k, v in raw.items()}

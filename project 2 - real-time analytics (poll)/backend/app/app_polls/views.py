@@ -9,7 +9,11 @@ from .models import Poll
 from .schemas import CreatePoll, CreatePollOut, ErrorSchema, PollOut, VoteSchema
 from .services.cookie_services import has_cookie_voted, set_vote_cookie
 from .services.ip_services import get_client_ip
-from .services.redis_poll_services import try_register_vote, record_vote
+from .services.redis_poll_services import (
+    try_register_vote,
+    record_vote,
+    get_poll_vote_count,
+)
 
 # Create your views here.
 
@@ -84,3 +88,33 @@ async def vote(
     response = JsonResponse({"message": f"Vote for option {option_id} is considered"})
     set_vote_cookie(response, request, poll_id)
     return response
+
+
+@router.get(
+    "/polls/{poll_id}/result", response={200: dict, 400: ErrorSchema, 404: ErrorSchema}
+)
+async def pool_results(request, poll_id: int):
+    try:
+        poll = await Poll.objects.aget(pk=poll_id)
+    except Poll.DoesNotExist:
+        return {"error": "requested poll is not found"}
+
+    results = await get_poll_vote_count(poll_id)
+
+    for option_id in poll.text.keys():
+        if option_id not in results:
+            """
+            Ensures every poll option has a vote count, even if it's zero:
+            {"1": 12,"2": 8, "3": 0,"4": 0}
+            """
+            results[option_id] = 0
+
+    total_votes = sum(results.values())
+
+    return {
+        "poll_id": poll.id,
+        "question": poll.question,
+        "options": [{"id": k, "text": v} for k, v in poll.text.items()],
+        "results": results,
+        "total_votes": total_votes,
+    }
