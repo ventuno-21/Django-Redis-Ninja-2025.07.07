@@ -72,6 +72,8 @@ async def record_vote(poll_id: int, voter_id: str, ip: str, option_id: str):
         pipe.ltrim(recent_key, 0, 99)
         await pipe.execute()
 
+    await delete_cache_poll_results(poll_id)
+
 
 # # track_recent_vote & get_recent_vote functions are replaced with record_vote
 # async def track_recent_vote(poll_id: int, user_id: str, ip: str, option_id: str):
@@ -97,3 +99,23 @@ async def get_poll_vote_count(poll_id: int) -> dict:
     key = get_poll_key(poll_id, "votes")
     raw = await r.hgetall(key)
     return {k: int(v) for k, v in raw.items()}
+
+
+async def get_cached_poll_results(poll_id: int) -> dict | None:
+    key = get_poll_key(poll_id, "results_data")
+    cached = await r.get(key)
+    if cached:
+        return json.loads(cached)
+    return None
+
+
+async def cache_poll_results(
+    poll_id: int, data: dict, expire_seconds: int = 3600
+) -> None:
+    key = get_poll_key(poll_id, "results_data")
+    await r.set(key, json.dumps(data), ex=expire_seconds)
+
+
+async def delete_cache_poll_results(poll_id: int) -> None:
+    key = get_poll_key(poll_id, "results_data")
+    await r.delete(key)

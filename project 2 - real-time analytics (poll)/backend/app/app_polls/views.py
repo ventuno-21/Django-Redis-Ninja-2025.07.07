@@ -14,6 +14,8 @@ from .services.redis_poll_services import (
     record_vote,
     get_poll_vote_count,
     is_rate_limited,
+    get_cached_poll_results,
+    cache_poll_results,
 )
 
 # Create your views here.
@@ -98,6 +100,11 @@ async def vote(
     "/polls/{poll_id}/result", response={200: dict, 400: ErrorSchema, 404: ErrorSchema}
 )
 async def pool_results(request, poll_id: int):
+
+    cached = await get_cached_poll_results(poll_id)
+    if cached:
+        return cached
+
     try:
         poll = await Poll.objects.aget(pk=poll_id)
     except Poll.DoesNotExist:
@@ -115,10 +122,14 @@ async def pool_results(request, poll_id: int):
 
     total_votes = sum(results.values())
 
-    return {
+    response = {
         "poll_id": poll.id,
         "question": poll.question,
         "options": [{"id": k, "text": v} for k, v in poll.text.items()],
         "results": results,
         "total_votes": total_votes,
     }
+
+    await cache_poll_results(poll_id, response)  # Cache if for next time
+
+    return response
