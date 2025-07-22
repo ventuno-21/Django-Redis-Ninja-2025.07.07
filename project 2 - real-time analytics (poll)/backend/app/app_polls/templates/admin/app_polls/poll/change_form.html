@@ -1,0 +1,17 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="{% static 'polls/js/poll_results_updater.js' %}">
+</script>
+
+
+{% endblock %}
+
+{% block after_related_objects %}
+<div id="live-poll-results" data-poll-id="{{original.id}}">
+    <h3> Live poll results </h3>
+    <div id="poll-results-content"> Loading ...! </div>
+</div>
+{% endblock %} 
